@@ -1,0 +1,75 @@
+name: Deploy Backend to Cloud Run
+
+on:
+  push:
+    branches: [main, feat/auto-deploy]
+    paths:
+      - "backend/**"
+      - ".github/workflows/**"
+
+env:
+  PROJECT_ID: trim-descent-452802-t2
+  REGION: asia-southeast1
+  SERVICE: solar-bigquery-api
+  IMAGE: gcr.io/trim-descent-452802-t2/solar-bigquery-api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          create_credentials_file: true
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build Docker image
+        working-directory: backend
+        run: |
+          docker build \
+            -f Dockerfile.bigquery \
+            -t ${{ env.IMAGE }}:${{ github.sha }} \
+            -t ${{ env.IMAGE }}:latest \
+            .
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE }} \
+            --image ${{ env.IMAGE }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --memory 2Gi \
+            --cpu 2 \
+            --timeout 300 \
+            --max-instances 10 \
+            --set-env-vars "GCP_PROJECT_ID=trim-descent-452802-t2" \
+            --set-secrets "WXTECH_API_KEY=wni-api-key-v2:latest" \
+            --quiet
+
+      - name: Show deployed URL
+        run: |
+          URL=$(gcloud run services describe ${{ env.SERVICE }} \
+            --region ${{ env.REGION }} \
+            --format='value(status.url)')
+          echo "✅ Deployed: $URL"
+          echo "### Deployed to Cloud Run" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** $URL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.IMAGE }}:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY

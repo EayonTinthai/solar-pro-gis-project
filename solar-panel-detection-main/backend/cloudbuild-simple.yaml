@@ -1,0 +1,25 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-f'
+      - 'Dockerfile.bigquery'
+      - '-t'
+      - 'gcr.io/trim-descent-452802-t2/solar-bigquery-api:latest'
+      - '.'
+    
+  # Push the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - 'gcr.io/trim-descent-452802-t2/solar-bigquery-api:latest'
+
+images:
+  - 'gcr.io/trim-descent-452802-t2/solar-bigquery-api:latest'
+
+timeout: 1200s
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY

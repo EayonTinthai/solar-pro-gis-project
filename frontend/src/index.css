@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.625rem;
+
+    /* Map-overlay specific tokens */
+    --panel-bg: 0 0% 100% / 0.92;
+    --panel-bg-dark: 240 10% 3.9% / 0.90;
+    --panel-blur: 12px;
+    --panel-border: 240 5.9% 90% / 0.60;
+    --panel-shadow: 0 4px 24px hsl(240 10% 3.9% / 0.12), 0 1px 4px hsl(240 10% 3.9% / 0.08);
+    --panel-shadow-lg: 0 12px 48px hsl(240 10% 3.9% / 0.18), 0 2px 8px hsl(240 10% 3.9% / 0.10);
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    --panel-bg: 240 10% 3.9% / 0.90;
+    --panel-border: 240 3.7% 15.9% / 0.60;
+    --panel-shadow: 0 4px 24px hsl(0 0% 0% / 0.40), 0 1px 4px hsl(0 0% 0% / 0.20);
+    --panel-shadow-lg: 0 12px 48px hsl(0 0% 0% / 0.50), 0 2px 8px hsl(0 0% 0% / 0.30);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      'Segoe UI', sans-serif;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  #root {
+    @apply h-dvh w-full overflow-hidden;
+  }
+}
+
+/* Glass panel — used by ALL floating UI elements over the map */
+.glass-panel {
+  background: hsl(var(--panel-bg));
+  backdrop-filter: blur(var(--panel-blur));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  border: 1px solid hsl(var(--panel-border));
+  box-shadow: var(--panel-shadow);
+  border-radius: var(--radius);
+}
+
+.glass-panel-lg {
+  background: hsl(var(--panel-bg));
+  backdrop-filter: blur(var(--panel-blur));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  border: 1px solid hsl(var(--panel-border));
+  box-shadow: var(--panel-shadow-lg);
+  border-radius: calc(var(--radius) + 4px);
+}
+
+/* Panel drag handle for collapsible panels */
+.panel-handle {
+  width: 32px;
+  height: 3px;
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 9999px;
+  margin: 0 auto 12px;
+  flex-shrink: 0;
+}
+
+/* Remove Leaflet's default control styling — we use custom controls */
+.leaflet-control-zoom {
+  display: none !important;
+}
+.leaflet-control-attribution {
+  background: hsl(var(--background) / 0.7) !important;
+  color: hsl(var(--muted-foreground)) !important;
+  font-size: 10px !important;
+  backdrop-filter: blur(8px);
+  border-radius: 4px 0 0 0 !important;
+}
+
+/* Map container fills its parent */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+}
+
+/* Building polygon hover */
+.leaflet-interactive:hover {
+  filter: brightness(1.15);
+  cursor: pointer;
+}
+
+/* Popup styling — use glass panel tokens */
+.leaflet-popup-content-wrapper {
+  background: hsl(var(--panel-bg)) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid hsl(var(--panel-border)) !important;
+  box-shadow: var(--panel-shadow) !important;
+  border-radius: var(--radius) !important;
+  color: hsl(var(--foreground)) !important;
+  font-family: inherit !important;
+}
+.leaflet-popup-tip {
+  background: hsl(var(--card)) !important;
+}
+.leaflet-popup-close-button {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.building-info-popup .leaflet-popup-content {
+  margin: 10px 12px;
+}
+
+.building-popup-content {
+  min-width: 150px;
+  line-height: 1.25;
+}
+
+.building-popup-kicker {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.building-popup-title {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.building-popup-meta {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.building-popup-thumb {
+  display: block;
+  width: 100%;
+  height: 96px;
+  margin-top: 6px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid hsl(var(--border) / 0.45);
+}
+
+@media (max-width: 768px) {
+  .map-controls {
+    bottom: 120px !important;
+  }
+}
